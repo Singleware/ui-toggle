@@ -26,21 +26,11 @@ export declare class Template extends Control.Component<Properties> {
      */
     private skeleton;
     /**
-     * Toggles elements.
-     */
-    private elements;
-    /**
      * Enable or disable the specified property in this elements.
      * @param property Property name.
      * @param state Determines whether the property must be enabled or disabled.
      */
     protected setDataProperty(property: string, state: boolean): void;
-    /**
-     * Toggles this button by the last toggled button.
-     * @param force Determines whether the same switch must be unchecked.
-     * @returns Returns the last button or undefined when there is no last button.
-     */
-    private toggleButton;
     /**
      * Click event handler.
      * @param event Event information.
@@ -93,6 +83,14 @@ export declare class Template extends Control.Component<Properties> {
     */
     checked: boolean;
     /**
+     * Get default toggle value.
+     */
+    readonly defaultValue: any;
+    /**
+     * Get default checked state.
+     */
+    readonly defaultChecked: boolean;
+    /**
      * Get read-only state.
      */
     /**
@@ -110,6 +108,10 @@ export declare class Template extends Control.Component<Properties> {
      * Toggle element.
      */
     readonly element: Element;
+    /**
+     * Reset the toggle to its initial value and state.
+     */
+    reset(): void;
     /**
      * Toggle groups.
      */

@@ -8,6 +8,7 @@ import * as Control from '@singleware/ui-control';
 
 import { Properties } from './properties';
 import { Element } from './element';
+import { States } from './states';
 
 /**
  * Toggle template class.
@@ -22,19 +23,19 @@ export class Template extends Control.Component<Properties> {
     name: '',
     readOnly: false,
     checked: false
-  };
+  } as States;
 
   /**
    * Mark element.
    */
   @Class.Private()
-  private markSlot: HTMLSlotElement = <slot name="mark" class="mark" /> as HTMLSlotElement;
+  private markSlot = <slot name="mark" class="mark" /> as HTMLSlotElement;
 
   /**
    * Toggle element.
    */
   @Class.Private()
-  private toggle: HTMLButtonElement = (
+  private toggle = (
     <button type="button" class="toggle">
       {this.markSlot}
     </button>
@@ -44,7 +45,7 @@ export class Template extends Control.Component<Properties> {
    * Toggle styles.
    */
   @Class.Private()
-  private styles: HTMLStyleElement = (
+  private styles = (
     <style>
       {`:host > .toggle {
   user-select: none;
@@ -62,17 +63,11 @@ export class Template extends Control.Component<Properties> {
    * Toggle skeleton.
    */
   @Class.Private()
-  private skeleton: Element = (
+  private skeleton = (
     <div slot={this.properties.slot} class={this.properties.class}>
       {this.children}
     </div>
   ) as Element;
-
-  /**
-   * Toggles elements.
-   */
-  @Class.Private()
-  private elements: ShadowRoot = DOM.append(this.skeleton.attachShadow({ mode: 'closed' }), this.styles, this.toggle) as ShadowRoot;
 
   /**
    * Enable or disable the specified property in this elements.
@@ -89,27 +84,6 @@ export class Template extends Control.Component<Properties> {
   }
 
   /**
-   * Toggles this button by the last toggled button.
-   * @param force Determines whether the same switch must be unchecked.
-   * @returns Returns the last button or undefined when there is no last button.
-   */
-  @Class.Private()
-  private toggleButton(force: boolean): Element | undefined {
-    const last = Template.groups[this.group];
-    if (last === this.skeleton) {
-      if (force) {
-        Template.groups[this.group] = void 0;
-      }
-    } else {
-      if (last) {
-        last.checked = false;
-      }
-      Template.groups[this.group] = this.skeleton;
-    }
-    return last;
-  }
-
-  /**
    * Click event handler.
    * @param event Event information.
    */
@@ -117,13 +91,15 @@ export class Template extends Control.Component<Properties> {
   private clickHandler(event: Event): void {
     if (this.states.readOnly) {
       event.preventDefault();
-    } else if (this.group.length) {
-      const last = this.toggleButton(false);
+    } else if (this.group) {
+      const last = Template.groups[this.group];
       if (last !== this.skeleton) {
         if (last) {
+          last.checked = false;
           Template.notifyChanges(last);
         }
-        this.setDataProperty('checked', true);
+        this.setDataProperty('checked', (this.states.checked = true));
+        Template.groups[this.group] = this.skeleton;
         Template.notifyChanges(this.skeleton);
       }
     } else {
@@ -150,6 +126,8 @@ export class Template extends Control.Component<Properties> {
       group: super.bindDescriptor(this, Template.prototype, 'group'),
       value: super.bindDescriptor(this, Template.prototype, 'value'),
       checked: super.bindDescriptor(this, Template.prototype, 'checked'),
+      defaultValue: super.bindDescriptor(this, Template.prototype, 'defaultValue'),
+      defaultChecked: super.bindDescriptor(this, Template.prototype, 'defaultChecked'),
       readOnly: super.bindDescriptor(this, Template.prototype, 'readOnly'),
       disabled: super.bindDescriptor(this, Template.prototype, 'disabled')
     });
@@ -170,6 +148,7 @@ export class Template extends Control.Component<Properties> {
    */
   constructor(properties?: Properties, children?: any[]) {
     super(properties, children);
+    DOM.append(this.skeleton.attachShadow({ mode: 'closed' }), this.styles, this.toggle);
     this.bindHandlers();
     this.bindProperties();
     this.assignProperties();
@@ -232,11 +211,34 @@ export class Template extends Control.Component<Properties> {
    * Set toggle state.
    */
   public set checked(state: boolean) {
-    this.setDataProperty('checked', state);
-    this.states.checked = state;
-    if (this.group.length) {
-      this.toggleButton(!state);
+    if (this.group) {
+      const last = Template.groups[this.group];
+      if (state) {
+        if (last && last !== this.skeleton) {
+          last.checked = false;
+        }
+        Template.groups[this.group] = this.skeleton;
+      } else if (last === this.skeleton) {
+        Template.groups[this.group] = void 0;
+      }
     }
+    this.setDataProperty('checked', (this.states.checked = state));
+  }
+
+  /**
+   * Get default toggle value.
+   */
+  @Class.Public()
+  public get defaultValue(): any {
+    return this.properties.value || 'on';
+  }
+
+  /**
+   * Get default checked state.
+   */
+  @Class.Public()
+  public get defaultChecked(): boolean {
+    return this.properties.checked || false;
   }
 
   /**
@@ -278,6 +280,15 @@ export class Template extends Control.Component<Properties> {
   @Class.Public()
   public get element(): Element {
     return this.skeleton;
+  }
+
+  /**
+   * Reset the toggle to its initial value and state.
+   */
+  @Class.Public()
+  public reset(): void {
+    this.value = this.defaultValue;
+    this.checked = this.defaultChecked;
   }
 
   /**

@@ -58,10 +58,7 @@ let Template = Template_1 = class Template extends Control.Component {
          * Toggle skeleton.
          */
         this.skeleton = (DOM.create("div", { slot: this.properties.slot, class: this.properties.class }, this.children));
-        /**
-         * Toggles elements.
-         */
-        this.elements = DOM.append(this.skeleton.attachShadow({ mode: 'closed' }), this.styles, this.toggle);
+        DOM.append(this.skeleton.attachShadow({ mode: 'closed' }), this.styles, this.toggle);
         this.bindHandlers();
         this.bindProperties();
         this.assignProperties();
@@ -80,26 +77,6 @@ let Template = Template_1 = class Template extends Control.Component {
         }
     }
     /**
-     * Toggles this button by the last toggled button.
-     * @param force Determines whether the same switch must be unchecked.
-     * @returns Returns the last button or undefined when there is no last button.
-     */
-    toggleButton(force) {
-        const last = Template_1.groups[this.group];
-        if (last === this.skeleton) {
-            if (force) {
-                Template_1.groups[this.group] = void 0;
-            }
-        }
-        else {
-            if (last) {
-                last.checked = false;
-            }
-            Template_1.groups[this.group] = this.skeleton;
-        }
-        return last;
-    }
-    /**
      * Click event handler.
      * @param event Event information.
      */
@@ -107,13 +84,15 @@ let Template = Template_1 = class Template extends Control.Component {
         if (this.states.readOnly) {
             event.preventDefault();
         }
-        else if (this.group.length) {
-            const last = this.toggleButton(false);
+        else if (this.group) {
+            const last = Template_1.groups[this.group];
             if (last !== this.skeleton) {
                 if (last) {
+                    last.checked = false;
                     Template_1.notifyChanges(last);
                 }
-                this.setDataProperty('checked', true);
+                this.setDataProperty('checked', (this.states.checked = true));
+                Template_1.groups[this.group] = this.skeleton;
                 Template_1.notifyChanges(this.skeleton);
             }
         }
@@ -137,6 +116,8 @@ let Template = Template_1 = class Template extends Control.Component {
             group: super.bindDescriptor(this, Template_1.prototype, 'group'),
             value: super.bindDescriptor(this, Template_1.prototype, 'value'),
             checked: super.bindDescriptor(this, Template_1.prototype, 'checked'),
+            defaultValue: super.bindDescriptor(this, Template_1.prototype, 'defaultValue'),
+            defaultChecked: super.bindDescriptor(this, Template_1.prototype, 'defaultChecked'),
             readOnly: super.bindDescriptor(this, Template_1.prototype, 'readOnly'),
             disabled: super.bindDescriptor(this, Template_1.prototype, 'disabled')
         });
@@ -193,11 +174,31 @@ let Template = Template_1 = class Template extends Control.Component {
      * Set toggle state.
      */
     set checked(state) {
-        this.setDataProperty('checked', state);
-        this.states.checked = state;
-        if (this.group.length) {
-            this.toggleButton(!state);
+        if (this.group) {
+            const last = Template_1.groups[this.group];
+            if (state) {
+                if (last && last !== this.skeleton) {
+                    last.checked = false;
+                }
+                Template_1.groups[this.group] = this.skeleton;
+            }
+            else if (last === this.skeleton) {
+                Template_1.groups[this.group] = void 0;
+            }
         }
+        this.setDataProperty('checked', (this.states.checked = state));
+    }
+    /**
+     * Get default toggle value.
+     */
+    get defaultValue() {
+        return this.properties.value || 'on';
+    }
+    /**
+     * Get default checked state.
+     */
+    get defaultChecked() {
+        return this.properties.checked || false;
     }
     /**
      * Get read-only state.
@@ -233,6 +234,13 @@ let Template = Template_1 = class Template extends Control.Component {
         return this.skeleton;
     }
     /**
+     * Reset the toggle to its initial value and state.
+     */
+    reset() {
+        this.value = this.defaultValue;
+        this.checked = this.defaultChecked;
+    }
+    /**
      * Notify element changes.
      */
     static notifyChanges(element) {
@@ -261,14 +269,8 @@ __decorate([
     Class.Private()
 ], Template.prototype, "skeleton", void 0);
 __decorate([
-    Class.Private()
-], Template.prototype, "elements", void 0);
-__decorate([
     Class.Protected()
 ], Template.prototype, "setDataProperty", null);
-__decorate([
-    Class.Private()
-], Template.prototype, "toggleButton", null);
 __decorate([
     Class.Private()
 ], Template.prototype, "clickHandler", null);
@@ -295,6 +297,12 @@ __decorate([
 ], Template.prototype, "checked", null);
 __decorate([
     Class.Public()
+], Template.prototype, "defaultValue", null);
+__decorate([
+    Class.Public()
+], Template.prototype, "defaultChecked", null);
+__decorate([
+    Class.Public()
 ], Template.prototype, "readOnly", null);
 __decorate([
     Class.Public()
@@ -302,6 +310,9 @@ __decorate([
 __decorate([
     Class.Public()
 ], Template.prototype, "element", null);
+__decorate([
+    Class.Public()
+], Template.prototype, "reset", null);
 __decorate([
     Class.Private()
 ], Template, "groups", void 0);
