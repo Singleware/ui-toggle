@@ -51,6 +51,7 @@ let Template = Template_1 = class Template extends Control.Component {
   outline: 0;
   padding: 0;
   border: 0;
+  margin: 0;
   cursor: inherit;
   background-color: transparent;
 }`));
@@ -64,11 +65,11 @@ let Template = Template_1 = class Template extends Control.Component {
         this.assignProperties();
     }
     /**
-     * Enable or disable the specified property in this elements.
+     * Updates the specified property state.
      * @param property Property name.
-     * @param state Determines whether the property must be enabled or disabled.
+     * @param state Property state.
      */
-    setDataProperty(property, state) {
+    updatePropertyState(property, state) {
         if (state) {
             this.skeleton.dataset[property] = 'on';
         }
@@ -91,13 +92,13 @@ let Template = Template_1 = class Template extends Control.Component {
                     last.checked = false;
                     Template_1.notifyChanges(last);
                 }
-                this.setDataProperty('checked', (this.states.checked = true));
+                this.updatePropertyState('checked', (this.states.checked = true));
                 Template_1.groups[this.group] = this.skeleton;
                 Template_1.notifyChanges(this.skeleton);
             }
         }
         else {
-            this.setDataProperty('checked', (this.states.checked = !this.states.checked));
+            this.updatePropertyState('checked', (this.states.checked = !this.states.checked));
             Template_1.notifyChanges(this.skeleton);
         }
     }
@@ -111,22 +112,22 @@ let Template = Template_1 = class Template extends Control.Component {
      * Bind exposed properties to the custom element.
      */
     bindProperties() {
-        Object.defineProperties(this.skeleton, {
-            name: super.bindDescriptor(this, Template_1.prototype, 'name'),
-            group: super.bindDescriptor(this, Template_1.prototype, 'group'),
-            value: super.bindDescriptor(this, Template_1.prototype, 'value'),
-            checked: super.bindDescriptor(this, Template_1.prototype, 'checked'),
-            defaultValue: super.bindDescriptor(this, Template_1.prototype, 'defaultValue'),
-            defaultChecked: super.bindDescriptor(this, Template_1.prototype, 'defaultChecked'),
-            readOnly: super.bindDescriptor(this, Template_1.prototype, 'readOnly'),
-            disabled: super.bindDescriptor(this, Template_1.prototype, 'disabled')
-        });
+        this.bindComponentProperties(this.skeleton, [
+            'name',
+            'group',
+            'value',
+            'checked',
+            'defaultValue',
+            'defaultChecked',
+            'readOnly',
+            'disabled'
+        ]);
     }
     /**
      * Assign all element properties.
      */
     assignProperties() {
-        Control.assignProperties(this, this.properties, ['name', 'group', 'value', 'checked', 'readOnly', 'disabled']);
+        this.assignComponentProperties(this.properties, ['name', 'group', 'value', 'checked', 'readOnly', 'disabled']);
     }
     /**
      * Get toggle name.
@@ -186,7 +187,7 @@ let Template = Template_1 = class Template extends Control.Component {
                 Template_1.groups[this.group] = void 0;
             }
         }
-        this.setDataProperty('checked', (this.states.checked = state));
+        this.updatePropertyState('checked', (this.states.checked = state));
     }
     /**
      * Get default toggle value.
@@ -210,9 +211,9 @@ let Template = Template_1 = class Template extends Control.Component {
      * Set read-only state.
      */
     set readOnly(state) {
-        this.setDataProperty('readonly', state);
         this.states.readOnly = state;
         this.toggle.disabled = state || this.toggle.disabled;
+        this.updatePropertyState('readonly', state);
     }
     /**
      * Get disabled state.
@@ -224,8 +225,8 @@ let Template = Template_1 = class Template extends Control.Component {
      * Set disabled state.
      */
     set disabled(state) {
-        this.setDataProperty('disabled', state);
         this.toggle.disabled = state || this.states.readOnly;
+        this.updatePropertyState('disabled', state);
     }
     /**
      * Toggle element.
@@ -269,8 +270,8 @@ __decorate([
     Class.Private()
 ], Template.prototype, "skeleton", void 0);
 __decorate([
-    Class.Protected()
-], Template.prototype, "setDataProperty", null);
+    Class.Private()
+], Template.prototype, "updatePropertyState", null);
 __decorate([
     Class.Private()
 ], Template.prototype, "clickHandler", null);

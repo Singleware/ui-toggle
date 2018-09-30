@@ -53,6 +53,7 @@ export class Template extends Control.Component<Properties> {
   outline: 0;
   padding: 0;
   border: 0;
+  margin: 0;
   cursor: inherit;
   background-color: transparent;
 }`}
@@ -70,12 +71,12 @@ export class Template extends Control.Component<Properties> {
   ) as Element;
 
   /**
-   * Enable or disable the specified property in this elements.
+   * Updates the specified property state.
    * @param property Property name.
-   * @param state Determines whether the property must be enabled or disabled.
+   * @param state Property state.
    */
-  @Class.Protected()
-  protected setDataProperty(property: string, state: boolean): void {
+  @Class.Private()
+  private updatePropertyState(property: string, state: boolean): void {
     if (state) {
       this.skeleton.dataset[property] = 'on';
     } else {
@@ -98,12 +99,12 @@ export class Template extends Control.Component<Properties> {
           last.checked = false;
           Template.notifyChanges(last);
         }
-        this.setDataProperty('checked', (this.states.checked = true));
+        this.updatePropertyState('checked', (this.states.checked = true));
         Template.groups[this.group] = this.skeleton;
         Template.notifyChanges(this.skeleton);
       }
     } else {
-      this.setDataProperty('checked', (this.states.checked = !this.states.checked));
+      this.updatePropertyState('checked', (this.states.checked = !this.states.checked));
       Template.notifyChanges(this.skeleton);
     }
   }
@@ -121,16 +122,16 @@ export class Template extends Control.Component<Properties> {
    */
   @Class.Private()
   private bindProperties(): void {
-    Object.defineProperties(this.skeleton, {
-      name: super.bindDescriptor(this, Template.prototype, 'name'),
-      group: super.bindDescriptor(this, Template.prototype, 'group'),
-      value: super.bindDescriptor(this, Template.prototype, 'value'),
-      checked: super.bindDescriptor(this, Template.prototype, 'checked'),
-      defaultValue: super.bindDescriptor(this, Template.prototype, 'defaultValue'),
-      defaultChecked: super.bindDescriptor(this, Template.prototype, 'defaultChecked'),
-      readOnly: super.bindDescriptor(this, Template.prototype, 'readOnly'),
-      disabled: super.bindDescriptor(this, Template.prototype, 'disabled')
-    });
+    this.bindComponentProperties(this.skeleton, [
+      'name',
+      'group',
+      'value',
+      'checked',
+      'defaultValue',
+      'defaultChecked',
+      'readOnly',
+      'disabled'
+    ]);
   }
 
   /**
@@ -138,7 +139,7 @@ export class Template extends Control.Component<Properties> {
    */
   @Class.Private()
   private assignProperties(): void {
-    Control.assignProperties(this, this.properties, ['name', 'group', 'value', 'checked', 'readOnly', 'disabled']);
+    this.assignComponentProperties(this.properties, ['name', 'group', 'value', 'checked', 'readOnly', 'disabled']);
   }
 
   /**
@@ -222,7 +223,7 @@ export class Template extends Control.Component<Properties> {
         Template.groups[this.group] = void 0;
       }
     }
-    this.setDataProperty('checked', (this.states.checked = state));
+    this.updatePropertyState('checked', (this.states.checked = state));
   }
 
   /**
@@ -253,9 +254,9 @@ export class Template extends Control.Component<Properties> {
    * Set read-only state.
    */
   public set readOnly(state: boolean) {
-    this.setDataProperty('readonly', state);
     this.states.readOnly = state;
     this.toggle.disabled = state || this.toggle.disabled;
+    this.updatePropertyState('readonly', state);
   }
 
   /**
@@ -270,8 +271,8 @@ export class Template extends Control.Component<Properties> {
    * Set disabled state.
    */
   public set disabled(state: boolean) {
-    this.setDataProperty('disabled', state);
     this.toggle.disabled = state || this.states.readOnly;
+    this.updatePropertyState('disabled', state);
   }
 
   /**
