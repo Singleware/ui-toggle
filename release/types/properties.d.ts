@@ -44,6 +44,10 @@ export interface Properties {
    */
   disabled?: boolean;
   /**
+   * Determines whether the toggle must return status or value.
+   */
+  statusOnly?: boolean;
+  /**
    * Toggle children.
    */
   children?: {};

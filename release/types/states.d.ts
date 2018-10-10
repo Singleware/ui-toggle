@@ -16,6 +16,10 @@ export interface States {
    */
   readOnly: boolean;
   /**
+   * Determines whether the toggle must return status or value.
+   */
+  statusOnly: boolean;
+  /**
    * Determines whether the toggle is checked or not.
    */
   checked: boolean;

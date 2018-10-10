@@ -120,14 +120,15 @@ let Template = Template_1 = class Template extends Control.Component {
             'defaultValue',
             'defaultChecked',
             'readOnly',
-            'disabled'
+            'disabled',
+            'statusOnly'
         ]);
     }
     /**
      * Assign all element properties.
      */
     assignProperties() {
-        this.assignComponentProperties(this.properties, ['name', 'group', 'value', 'checked', 'readOnly', 'disabled']);
+        this.assignComponentProperties(this.properties, ['name', 'group', 'value', 'checked', 'readOnly', 'disabled', 'statusOnly']);
     }
     /**
      * Get toggle name.
@@ -157,13 +158,21 @@ let Template = Template_1 = class Template extends Control.Component {
      * Get toggle value.
      */
     get value() {
+        if (this.states.statusOnly) {
+            return this.checked;
+        }
         return this.checked ? this.toggle.value : void 0;
     }
     /**
      * Set toggle value.
      */
     set value(value) {
-        this.toggle.value = value;
+        if (this.states.statusOnly) {
+            this.checked = Boolean(value);
+        }
+        else {
+            this.toggle.value = value;
+        }
     }
     /**
      * Get toggle state.
@@ -227,6 +236,18 @@ let Template = Template_1 = class Template extends Control.Component {
     set disabled(state) {
         this.toggle.disabled = state || this.states.readOnly;
         this.updatePropertyState('disabled', state);
+    }
+    /**
+     * Get status-only state.
+     */
+    get statusOnly() {
+        return this.states.statusOnly;
+    }
+    /**
+     * Set status-only state.
+     */
+    set statusOnly(state) {
+        this.states.statusOnly = state;
     }
     /**
      * Toggle element.
@@ -308,6 +329,9 @@ __decorate([
 __decorate([
     Class.Public()
 ], Template.prototype, "disabled", null);
+__decorate([
+    Class.Public()
+], Template.prototype, "statusOnly", null);
 __decorate([
     Class.Public()
 ], Template.prototype, "element", null);
