@@ -131,7 +131,8 @@ export class Template extends Control.Component<Properties> {
       'defaultChecked',
       'readOnly',
       'disabled',
-      'statusOnly'
+      'statusOnly',
+      'reset'
     ]);
   }
 

@@ -121,7 +121,8 @@ let Template = Template_1 = class Template extends Control.Component {
             'defaultChecked',
             'readOnly',
             'disabled',
-            'statusOnly'
+            'statusOnly',
+            'reset'
         ]);
     }
     /**
