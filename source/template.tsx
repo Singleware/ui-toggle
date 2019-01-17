@@ -56,6 +56,7 @@ export class Template extends Control.Component<Properties> {
   margin: 0;
   cursor: inherit;
   background-color: transparent;
+  width: inherit;
 }`}
     </style>
   ) as HTMLStyleElement;

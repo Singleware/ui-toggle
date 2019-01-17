@@ -54,6 +54,7 @@ let Template = Template_1 = class Template extends Control.Component {
   margin: 0;
   cursor: inherit;
   background-color: transparent;
+  width: inherit;
 }`));
         /**
          * Toggle skeleton.

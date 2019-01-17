@@ -7,7 +7,7 @@
   "name": "@singleware/ui-toggle",
   "description": "Singleware UI toggle package.",
   "license": "MIT",
-  "version": "1.0.22",
+  "version": "1.0.24",
   "main": "release/source/index.js",
   "types": "release/types/index.d.ts",
   "keywords": [
@@ -22,16 +22,13 @@
     "type": "git",
     "url": "https://github.com/singleware/ui-toggle"
   },
-  "engines": {
-    "node": ">=8"
-  },
   "dependencies": {
-    "@singleware/class": "^1.1.12",
-    "@singleware/jsx": "^1.0.12",
-    "@singleware/ui-control": "^1.1.2"
+    "@singleware/class": "^1.1.14",
+    "@singleware/jsx": "^1.0.18",
+    "@singleware/ui-control": "^1.1.4"
   },
   "devDependencies": {
-    "prettier": "^1.14.3",
+    "prettier": "^1.15.3",
     "typescript": "^2.9.2"
   },
   "prettier": {
